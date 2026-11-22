@@ -1,0 +1,65 @@
+
+services:
+  api:
+    build: .
+    container_name: hotel-offer-api
+    ports:
+      - "3001:3000"
+    environment:
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      TEMPORAL_ADDRESS: temporal:7233
+      SERVICE_URL: http://api:3000
+      SUPPLIER_A_ENABLED: ${SUPPLIER_A_ENABLED:-true}
+      SUPPLIER_B_ENABLED: ${SUPPLIER_B_ENABLED:-true}
+    depends_on:
+      - redis
+      - temporal
+    restart: unless-stopped
+
+  worker:
+    build: .
+    container_name: hotel-offer-worker
+    command: ["node", "dist/worker.js"]
+    environment:
+      REDIS_URL: redis://redis:6379
+      TEMPORAL_ADDRESS: temporal:7233
+      SERVICE_URL: http://api:3000
+    depends_on:
+      - api
+      - temporal
+      - redis
+    restart: unless-stopped
+
+  temporal:
+    image: temporalio/temporal:latest
+    container_name: hotel-offer-temporal
+    command:
+      - server
+      - start-dev
+      - --ip
+      - 0.0.0.0
+      - --db-filename
+      - /tmp/temporal.db
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: hotel-offer-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  redis-data:

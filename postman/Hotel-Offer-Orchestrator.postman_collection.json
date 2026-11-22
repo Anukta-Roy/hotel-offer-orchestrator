@@ -1,0 +1,58 @@
+{
+  "info": {
+    "name": "Hotel Offer Orchestrator",
+    "_postman_id": "f3b5a92c-7d4e-4d66-9c28-3b62f1a4b2c0",
+    "description": "Requests for aggregation, Redis price filtering, supplier mocks and health.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Aggregate Delhi hotels",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/hotels?city=delhi"
+      }
+    },
+    {
+      "name": "Filter Delhi hotels by price",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/hotels?city=delhi&minPrice=5000&maxPrice=6000"
+      }
+    },
+    {
+      "name": "City with no results",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/hotels?city=jaipur"
+      }
+    },
+    {
+      "name": "Supplier A mock",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/supplierA/hotels?city=delhi"
+      }
+    },
+    {
+      "name": "Supplier B mock",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/supplierB/hotels?city=delhi"
+      }
+    },
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    }
+  ]
+}
